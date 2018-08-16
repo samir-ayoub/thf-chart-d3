@@ -1,1 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+
+.axis line, .axis .domain {
+  stroke: #eceeee;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: #1d2426;
+  font-size: 12px;
+}

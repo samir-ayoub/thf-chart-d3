@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+
+  menus = [
+    { label: 'Chart Line', link: './chart-line' },
+    { label: 'Chart Line2', link: './chart-line2' },
+  ];
+
 }
