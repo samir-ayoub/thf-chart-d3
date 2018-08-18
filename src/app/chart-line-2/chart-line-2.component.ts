@@ -22,9 +22,10 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   totalValue = 0;
   xScale;
   yScale;
-  xAxis; // D3 X Axis
-  xAxisGrid;
-  yAxis; // D3 Y Axis
+  xAxisGen; // D3 X Axis
+  xAxis;
+  yAxisGen; // D3 Y Axis
+  yAxis;
   tooltip;
   formatTime = d3.timeFormat('%e %B');
 
@@ -89,29 +90,28 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
 
 
   // grid + axis
-    this.xAxis = d3.axisBottom(this.xScale)
-      .ticks((this.width) / (this.height) * (this.monthimports.length / 2))
+    this.xAxisGen = d3.axisBottom(this.xScale)
+      .ticks(this.monthimports.length)
       .tickSize(-this.height);
 
-    this.gridX = this.svg.append('g')
-      .attr('transform', `translate(0, ${this.height})`)
+    this.xAxis = this.svg.append('g')
+      .call(this.xAxisGen)
       .attr('class', 'axis axis--x')
-      .call(this.xAxis)
+      .attr('transform', `translate(0, ${this.height})`)
       .selectAll('text')
       .attr('x', -10)
       .attr('y', 15)
       .style('text-anchor', 'start');
 
-    this.yAxis = d3.axisLeft(this.yScale)
-      .ticks((this.width) / (this.height) * (this.monthimports.length / 2))
-      .tickSize(this.width);
+    this.yAxisGen = d3.axisLeft(this.yScale)
+      .ticks(4)
+      .tickSize(-this.width)
 
-    this.gridY = this.svg.append('g')
-    .attr('transform', `translate(${this.width}, 0)`)
+     this.yAxis = this.svg.append('g')
+      .call(this.yAxisGen)
       .attr('class', 'axis axis--y')
-      .call(this.yAxis)
       .selectAll('text')
-      .attr('x', -this.width - 44)
+      .attr('x', - 40)
       .attr('y', 0)
       .style('text-anchor', 'start');
 
