@@ -101,3 +101,16 @@ export class ChartLineComponent implements AfterContentInit {
 
   }
   
+
+
+        // this.line2 = d3.line()
+      // .x((d: any) => this.xScale(d.month))
+      // .y((d: any) => this.yScale(d.exports))
+      // .curve(d3.curveLinear);
+
+      // this.viz2 = this.svg.
+      // append('path')
+      // .attr('d', this.line2(this.monthimports))
+      // .attr('stroke', '#c64840')
+      // .attr('stroke-this.width', 2)
+      // .attr('fill', 'none');

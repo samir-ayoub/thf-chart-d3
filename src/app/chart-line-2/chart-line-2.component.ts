@@ -2,12 +2,19 @@ import { Component, OnInit, AfterContentInit } from '@angular/core';
 
 import * as d3 from 'd3';
 
+import { ChartLineService } from './chart-line.service';
+
 @Component({
   selector: 'app-chart-line-2',
   templateUrl: './chart-line-2.component.html',
-  styleUrls: ['./chart-line-2.component.css']
+  styleUrls: ['./chart-line-2.component.css'],
+  providers:[ChartLineService]
 })
 export class ChartLine2Component implements OnInit, AfterContentInit {
+
+  categories;
+  series;
+
 
   height;
   width;
@@ -46,17 +53,33 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     {'month': 'out', 'imports': 130, 'exports': 299}
   ];
 
-  constructor() { }
+  constructor(private chartLineService: ChartLineService) { }
 
   ngOnInit() {
+    this.categories = this.chartLineService.getCategoriesMonth();
+    this.series = this.chartLineService.getSeriesMonth();
+
+
   }
 
   ngAfterContentInit() {
     this.createSvg();
   }
 
-  private setup() {
+  private svgBuild() {
+    this.buildSvg();
+    this.buildAxis();
 
+    this.buildLine();
+    this.buildDots();
+  }
+
+  private createSvg() {
+    this.setup();
+    this.svgBuild();
+  }
+
+  private setup() {
     this.margin = { top: 32, right: 16, bottom: 96, left: 64 };
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
@@ -72,114 +95,88 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     this.tooltip = d3.select('#chartline').append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-
   }
 
-  private svgSettings() {
+  private buildSvg() {
+        this.svg = d3.select('#chartline')
+        .append('svg')
+        .attr('width', this.width + this.margin.left + this.margin.right)
+        .attr('height', this.height + this.margin.top + this.margin.bottom)
+        .append('g')
+        .attr('class', 'svg-element')
+        .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+  }
 
-    // building svg
-    this.svg = d3.select('#chartline')
-      .append('svg')
-      .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom)
-      .append('g')
-      .attr('class', 'svg-element')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
-
-
-
-
-  // grid + axis
+  private buildAxis() {
     this.xAxisGen = d3.axisBottom(this.xScale)
-      .ticks(this.monthimports.length)
-      .tickSize(-this.height);
+    .ticks(this.monthimports.length)
+    .tickSize(-this.height);
 
-    this.xAxis = this.svg.append('g')
-      .call(this.xAxisGen)
-      .attr('class', 'axis axis--x')
-      .attr('transform', `translate(0, ${this.height})`)
-      .selectAll('text')
-      .attr('x', -10)
-      .attr('y', 15)
-      .style('text-anchor', 'start');
+  this.xAxis = this.svg.append('g')
+    .call(this.xAxisGen)
+    .attr('class', 'axis axis--x')
+    .attr('transform', `translate(0, ${this.height})`)
+    .selectAll('text')
+    .attr('x', -10)
+    .attr('y', 15)
+    .style('text-anchor', 'start');
 
-    this.yAxisGen = d3.axisLeft(this.yScale)
-      .ticks(4)
-      .tickSize(-this.width)
+  this.yAxisGen = d3.axisLeft(this.yScale)
+    .ticks(4)
+    .tickSize(-this.width)
 
-     this.yAxis = this.svg.append('g')
-      .call(this.yAxisGen)
-      .attr('class', 'axis axis--y')
-      .selectAll('text')
-      .attr('x', - 40)
-      .attr('y', 0)
-      .style('text-anchor', 'start');
+   this.yAxis = this.svg.append('g')
+    .call(this.yAxisGen)
+    .attr('class', 'axis axis--y')
+    .selectAll('text')
+    .attr('x', - 40)
+    .attr('y', 0)
+    .style('text-anchor', 'start');
 
-    // escala e tipo da linha
+  }
+
+  private buildLine() {
+
+    this.series.map(serie => console.log(serie))
+
+
     this.line = d3.line()
-      .x((d: any) => this.xScale(d.month))
-      .y((d: any) => this.yScale(d.imports))
-      .curve(d3.curveLinear);
+    .x((d: any) => this.xScale(d.month))
+    .y((d: any) => this.yScale(d.imports))
+    .curve(d3.curveLinear);
 
-      this.line2 = d3.line()
-      .x((d: any) => this.xScale(d.month))
-      .y((d: any) => this.yScale(d.exports))
-      .curve(d3.curveLinear);
-
-    // estilo da linha
     this.viz = this.svg.
-      append('path')
-      .attr('d', this.line(this.monthimports))
-      .attr('stroke', '#00b28e')
-      .attr('stroke-this.width', 2)
-      .attr('fill', 'none');
+    append('path')
+    .attr('d', this.line(this.monthimports))
+    .attr('stroke', '#00b28e')
+    .attr('stroke-this.width', 2)
+    .attr('fill', 'none');
+  }
 
-      this.viz2 = this.svg.
-      append('path')
-      .attr('d', this.line2(this.monthimports))
-      .attr('stroke', '#c64840')
-      .attr('stroke-this.width', 2)
-      .attr('fill', 'none');
-
-    // dotss
+  private buildDots() {
     this.dots = this.svg.selectAll('circle')
-      .data(this.monthimports)
-      .enter()
-      .append('circle')
-      .attr('cx', (d: any) => this.xScale(d.month))
-      .attr('cy', (d: any) => this.yScale(d.imports))
-      .attr('r', '5')
-      .attr('fill', '#ffffff')
-      .attr('stroke', '#00b28e')
-      .attr('stroke-width', 2)
-      .on('mouseover', d => {
-        this.tooltip.transition()
-          .duration(200)
-          .style('opacity', .9);
-        this.tooltip.html(d.imports)
-          // .style('left', ((this.xScale(d.month) + this.margin.left - (this.tooltip.node().getBoundingClientRect().width / 2)) + 'px'))
-          .style('left', this.xScale(d.month) + this.margin.left - 12 + 'px')
-          .style('top', this.yScale(d.imports) - 12 + 'px');
-        })
-      .on('mouseout', () => {
-        this.tooltip.transition()
-          .duration(500)
-          .style('opacity', 0);
-        });
-
-        console.log(this.tooltip.node().getBoundingClientRect().width);
-
-        // .attr('x', (d, i) => i * (this.w / this.dataset.length) + (this.w / this.dataset.length - this.padding) / 2)
-
-
-
+    .data(this.monthimports)
+    .enter()
+    .append('circle')
+    .attr('cx', (d: any) => this.xScale(d.month))
+    .attr('cy', (d: any) => this.yScale(d.imports))
+    .attr('r', '5')
+    .attr('fill', '#ffffff')
+    .attr('stroke', '#00b28e')
+    .attr('stroke-width', 2)
+    .on('mouseover', d => {
+      this.tooltip.transition()
+        .duration(200)
+        .style('opacity', .9);
+      this.tooltip.html(d.imports)
+        .style('left', this.xScale(d.month) + this.margin.left - 12 + 'px')
+        .style('top', this.yScale(d.imports) - 12 + 'px');
+      })
+    .on('mouseout', () => {
+      this.tooltip.transition()
+        .duration(500)
+        .style('opacity', 0);
+      });
   }
-
-  private createSvg() {
-    this.setup();
-    this.svgSettings();
-  }
-
-
 
 }
