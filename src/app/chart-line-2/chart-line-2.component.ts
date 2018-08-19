@@ -20,7 +20,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   width;
   labels;
   line;
-  line2;
+  valueLine;
   dots;
   margin;
   svg;
@@ -58,20 +58,10 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   ngOnInit() {
     this.categories = this.chartLineService.getCategoriesMonth();
     this.series = this.chartLineService.getSeriesMonth();
-
-
   }
 
   ngAfterContentInit() {
     this.createSvg();
-  }
-
-  private svgBuild() {
-    this.buildSvg();
-    this.buildAxis();
-
-    this.buildLine();
-    this.buildDots();
   }
 
   private createSvg() {
@@ -79,22 +69,62 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     this.svgBuild();
   }
 
+  private svgBuild() {
+    this.buildSvg();
+    this.buildAxis();
+    this.buildTooltip();
+    this.checkingSeriesAmountToBuildDotsAndLines();
+  }
+
+  private checkingSeriesAmountToBuildDotsAndLines() {
+    this.series.map((serie) => {
+      let serieLineValues = [];
+      serie.data.map((dataItem, i) => {
+        serieLineValues.push({dataX:serie.data[i], dataY:this.categories[i]});
+      })
+      this.buildLine(serieLineValues);
+      this.buildDots(serieLineValues);
+    })
+  }
+  
+  private buildLine(serieData) {
+    this.valueLine = d3.line()
+    .x((d:any) => this.xScale(d.dataY))
+    .y((d:any) => this.yScale(d.dataX))
+    .curve(d3.curveLinear);
+
+    this.line = this.svg
+    .append('g')
+    .append('path')
+    .attr('d', this.valueLine(serieData))
+    .attr('stroke', '#00b28e')
+    .attr('stroke-this.width', 2)
+    .attr('fill', 'none')
+  }
+
+  private getCategorieMaxValue():number {
+    let maxX = 0;
+
+    this.series.filter(serie => {
+      serie.data.filter(dataNumber => {
+        return maxX = dataNumber >= maxX ? dataNumber : maxX
+      });
+    });
+    return maxX;
+  };
+
   private setup() {
     this.margin = { top: 32, right: 16, bottom: 96, left: 64 };
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
 
     this.xScale = d3.scalePoint()
-    .domain(this.monthimports.map(function(d) { return d.month; }))
+    .domain(this.categories.map(categorie => {return categorie}))
     .range([0, this.width]);
 
     this.yScale = d3.scaleLinear()
-    .domain([0, d3.max(this.monthimports, d => d['imports'])])
+    .domain([0, this.getCategorieMaxValue()])
     .range([this.height, 0]);
-
-    this.tooltip = d3.select('#chartline').append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
   }
 
   private buildSvg() {
@@ -112,54 +142,38 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     .ticks(this.monthimports.length)
     .tickSize(-this.height);
 
-  this.xAxis = this.svg.append('g')
-    .call(this.xAxisGen)
-    .attr('class', 'axis axis--x')
-    .attr('transform', `translate(0, ${this.height})`)
-    .selectAll('text')
-    .attr('x', -10)
-    .attr('y', 15)
-    .style('text-anchor', 'start');
+    this.xAxis = this.svg.append('g')
+      .call(this.xAxisGen)
+      .attr('class', 'axis axis--x')
+      .attr('transform', `translate(0, ${this.height})`)
+      .selectAll('text')
+      .attr('x', -10)
+      .attr('y', 15)
+      .style('text-anchor', 'start');
 
-  this.yAxisGen = d3.axisLeft(this.yScale)
-    .ticks(4)
-    .tickSize(-this.width)
+    this.yAxisGen = d3.axisLeft(this.yScale)
+      .ticks(4)
+      .tickSize(-this.width)
 
-   this.yAxis = this.svg.append('g')
-    .call(this.yAxisGen)
-    .attr('class', 'axis axis--y')
-    .selectAll('text')
-    .attr('x', - 40)
-    .attr('y', 0)
-    .style('text-anchor', 'start');
+    this.yAxis = this.svg.append('g')
+      .call(this.yAxisGen)
+      .attr('class', 'axis axis--y')
+      .selectAll('text')
+      .attr('x', - 40)
+      .attr('y', 0)
+      .style('text-anchor', 'start');
 
   }
 
-  private buildLine() {
-
-    this.series.map(serie => console.log(serie))
 
 
-    this.line = d3.line()
-    .x((d: any) => this.xScale(d.month))
-    .y((d: any) => this.yScale(d.imports))
-    .curve(d3.curveLinear);
-
-    this.viz = this.svg.
-    append('path')
-    .attr('d', this.line(this.monthimports))
-    .attr('stroke', '#00b28e')
-    .attr('stroke-this.width', 2)
-    .attr('fill', 'none');
-  }
-
-  private buildDots() {
+  private buildDots(serieData) {
     this.dots = this.svg.selectAll('circle')
-    .data(this.monthimports)
+    .data(serieData)
     .enter()
     .append('circle')
-    .attr('cx', (d: any) => this.xScale(d.month))
-    .attr('cy', (d: any) => this.yScale(d.imports))
+    .attr('cx', (d: any) => this.xScale(d.dataY))
+    .attr('cy', (d: any) => this.yScale(d.dataX))
     .attr('r', '5')
     .attr('fill', '#ffffff')
     .attr('stroke', '#00b28e')
@@ -178,5 +192,13 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
         .style('opacity', 0);
       });
   }
+
+  private buildTooltip() {
+    this.tooltip = d3.select('#chartline').append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 0);
+  }
+
+
 
 }
