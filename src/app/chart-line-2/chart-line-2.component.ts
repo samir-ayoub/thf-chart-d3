@@ -119,7 +119,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   };
 
   private setup() {
-    this.margin = { top: 32, right: 16, bottom: 96, left: 64 };
+    this.margin = { top: 32, right: 16, bottom: 56, left: 64 };
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
 
@@ -205,57 +205,28 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   }
 
   private buildLegend() {
-    this.legend = this.svg.append('g')
-      .attr('class', 'legend')
-      .attr('x', this.width - 65)
-      .attr('y', 25)
-      .attr('height', 100)
-      .attr('width', 100);
 
-    this.legend.selectAll('g')
+    this.legend = d3.select('#chartline').append('div')
+      .attr('class', 'legend');
+
+
+    this.legend.selectAll('legend')
     .data(this.series)
     .enter()
-    .append('g')
-
+    .append('div')
+    .attr('class', 'legend-item')
     .each(function(d, i) {
-      let g = d3.select(this);
-      g.append('rect')
-        .attr('x', 65)
-        .attr('y', i * 25)
-        .attr('width', 10)
-        .attr('height', 10)
-        .style('fill', '#ff0000');
+      const p = d3.select(this);
 
-    g.append('text')
-      .attr('x', 50)
-      .attr('y', i * 25 + 8)
-      .attr('height', 30)
-      .attr('width', 100)
-      .style('fill', '#ff0000')
-      .text(d.name);
+      p.append('span')
+      .attr('class', 'key-dot')
+      .style('background', () => '#00b28e');
+
+      p.append('p')
+      .attr('class', 'legend-text')
+        .text(d.name);
       });
   }
 
 
 }
-
-
-// legend.selectAll('g').data(dataset)
-// .enter()
-// .append('g')
-// .each(function(d, i) {
-//   var g = d3.select(this);
-//   g.append("rect")
-//     .attr("x", w - 65)
-//     .attr("y", i*25)
-//     .attr("width", 10)
-//     .attr("height", 10)
-//     .style("fill", color_hash[String(i)][1]);
-  
-//   g.append("text")
-//     .attr("x", w - 50)
-//     .attr("y", i * 25 + 8)
-//     .attr("height",30)
-//     .attr("width",100)
-//     .style("fill", color_hash[String(i)][1])
-//     .text(color_hash[String(i)][0]);

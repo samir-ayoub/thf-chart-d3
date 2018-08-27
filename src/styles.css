@@ -79,3 +79,27 @@ div.tooltip:after {
   border-radius: 8px;
   pointer-events: none;
 } */
+
+.key-dot {
+  display: inline-block;
+  height: 10px;
+  margin-right: .5em;
+  width: 10px;
+  border-radius: 10px;
+}
+
+.legend {
+  text-align: center;
+}
+
+.legend-item {
+  display: inline-block;
+}
+
+.legend-item:not(:first-child) {
+  margin-left: 32px;
+}
+
+.legend-text {
+  display: inline-block;
+}
