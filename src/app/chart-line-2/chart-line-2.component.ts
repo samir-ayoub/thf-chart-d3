@@ -8,7 +8,7 @@ import { ChartLineService } from './chart-line.service';
   selector: 'app-chart-line-2',
   templateUrl: './chart-line-2.component.html',
   styleUrls: ['./chart-line-2.component.css'],
-  providers:[ChartLineService]
+  providers: [ChartLineService]
 })
 export class ChartLine2Component implements OnInit, AfterContentInit {
 
@@ -19,6 +19,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   height;
   width;
   labels;
+  legend;
   line;
   valueLine;
   dots;
@@ -73,6 +74,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     this.buildSvg();
     this.buildAxis();
     this.buildTooltip();
+    this.buildLegend();
     this.checkingSeriesAmountToBuildDotsAndLines();
   }
 
@@ -80,11 +82,10 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     this.series.map((serie) => {
       let serieLineValues = [];
       serie.data.map((dataItem, i) => {
-        serieLineValues.push({dataX:serie.data[i], dataY:this.categories[i]});
-      })
+        serieLineValues.push({dataX: serie.data[i], dataY: this.categories[i]});
+      });
       this.buildLine(serieLineValues);
-      this.buildDots(serieLineValues);
-    })
+    });
   }
   
   private buildLine(serieData) {
@@ -95,19 +96,23 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
 
     this.line = this.svg
     .append('g')
+    .attr('class', 'line-item')
     .append('path')
     .attr('d', this.valueLine(serieData))
     .attr('stroke', '#00b28e')
     .attr('stroke-this.width', 2)
-    .attr('fill', 'none')
+    .attr('fill', 'none');
+
+    this.buildDots(serieData);
+
   }
 
-  private getCategorieMaxValue():number {
+  private getCategorieMaxValue(): number {
     let maxX = 0;
 
     this.series.filter(serie => {
       serie.data.filter(dataNumber => {
-        return maxX = dataNumber >= maxX ? dataNumber : maxX
+        return maxX = dataNumber >= maxX ? dataNumber : maxX;
       });
     });
     return maxX;
@@ -153,7 +158,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
 
     this.yAxisGen = d3.axisLeft(this.yScale)
       .ticks(4)
-      .tickSize(-this.width)
+      .tickSize(-this.width);
 
     this.yAxis = this.svg.append('g')
       .call(this.yAxisGen)
@@ -162,13 +167,12 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
       .attr('x', - 40)
       .attr('y', 0)
       .style('text-anchor', 'start');
-
   }
 
-
-
   private buildDots(serieData) {
-    this.dots = this.svg.selectAll('circle')
+    this.dots = this.svg
+    .append('g')
+    .selectAll('.dot')
     .data(serieData)
     .enter()
     .append('circle')
@@ -179,12 +183,13 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     .attr('stroke', '#00b28e')
     .attr('stroke-width', 2)
     .on('mouseover', d => {
+      // d3.select(this.).attr('r', 10).style('fill', 'red');
       this.tooltip.transition()
         .duration(200)
         .style('opacity', .9);
-      this.tooltip.html(d.imports)
-        .style('left', this.xScale(d.month) + this.margin.left - 12 + 'px')
-        .style('top', this.yScale(d.imports) - 12 + 'px');
+      this.tooltip.html(d.dataX)
+        .style('left', this.xScale(d.dataY) + this.margin.left - 12 + 'px')
+        .style('top', this.yScale(d.dataX) - 12 + 'px');
       })
     .on('mouseout', () => {
       this.tooltip.transition()
@@ -199,6 +204,58 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     .style('opacity', 0);
   }
 
+  private buildLegend() {
+    this.legend = this.svg.append('g')
+      .attr('class', 'legend')
+      .attr('x', this.width - 65)
+      .attr('y', 25)
+      .attr('height', 100)
+      .attr('width', 100);
+
+    this.legend.selectAll('g')
+    .data(this.series)
+    .enter()
+    .append('g')
+
+    .each(function(d, i) {
+      let g = d3.select(this);
+      g.append('rect')
+        .attr('x', 65)
+        .attr('y', i * 25)
+        .attr('width', 10)
+        .attr('height', 10)
+        .style('fill', '#ff0000');
+
+    g.append('text')
+      .attr('x', 50)
+      .attr('y', i * 25 + 8)
+      .attr('height', 30)
+      .attr('width', 100)
+      .style('fill', '#ff0000')
+      .text(d.name);
+      });
+  }
 
 
 }
+
+
+// legend.selectAll('g').data(dataset)
+// .enter()
+// .append('g')
+// .each(function(d, i) {
+//   var g = d3.select(this);
+//   g.append("rect")
+//     .attr("x", w - 65)
+//     .attr("y", i*25)
+//     .attr("width", 10)
+//     .attr("height", 10)
+//     .style("fill", color_hash[String(i)][1]);
+  
+//   g.append("text")
+//     .attr("x", w - 50)
+//     .attr("y", i * 25 + 8)
+//     .attr("height",30)
+//     .attr("width",100)
+//     .style("fill", color_hash[String(i)][1])
+//     .text(color_hash[String(i)][0]);
