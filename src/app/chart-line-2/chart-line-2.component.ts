@@ -2,6 +2,7 @@ import { Component, OnInit, AfterContentInit } from '@angular/core';
 
 import * as d3 from 'd3';
 
+import { ThfChartColors } from './../commons/thf-chart-colors';
 import { ChartLineService } from './chart-line.service';
 
 @Component({
@@ -36,7 +37,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   yAxis;
   tooltip;
   formatTime = d3.timeFormat('%e %B');
-
+  color;
 
   gridX;
   gridY;
@@ -79,16 +80,16 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   }
 
   private checkingSeriesAmountToBuildDotsAndLines() {
-    this.series.map((serie) => {
+    this.series.map((serie, i) => {
       let serieLineValues = [];
       serie.data.map((dataItem, i) => {
         serieLineValues.push({dataX: serie.data[i], dataY: this.categories[i]});
       });
-      this.buildLine(serieLineValues);
+      this.buildLine(serieLineValues, i);
     });
   }
   
-  private buildLine(serieData) {
+  private buildLine(serieData, i) {
     this.valueLine = d3.line()
     .x((d:any) => this.xScale(d.dataY))
     .y((d:any) => this.yScale(d.dataX))
@@ -99,11 +100,11 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     .attr('class', 'line-item')
     .append('path')
     .attr('d', this.valueLine(serieData))
-    .attr('stroke', '#00b28e')
-    .attr('stroke-this.width', 2)
+    .attr('stroke', this.color[i])
+    .attr('stroke-width', 2)
     .attr('fill', 'none');
 
-    this.buildDots(serieData);
+    this.buildDots(serieData, i);
 
   }
 
@@ -122,6 +123,8 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     this.margin = { top: 32, right: 16, bottom: 56, left: 64 };
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
+
+    this.color = this.setColor();
 
     this.xScale = d3.scalePoint()
     .domain(this.categories.map(categorie => {return categorie}))
@@ -169,7 +172,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
       .style('text-anchor', 'start');
   }
 
-  private buildDots(serieData) {
+  private buildDots(serieData, i) {
     this.dots = this.svg
     .append('g')
     .selectAll('.dot')
@@ -180,7 +183,7 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
     .attr('cy', (d: any) => this.yScale(d.dataX))
     .attr('r', '5')
     .attr('fill', '#ffffff')
-    .attr('stroke', '#00b28e')
+    .attr('stroke', this.color[i])
     .attr('stroke-width', 2)
     .on('mouseover', d => {
       // d3.select(this.).attr('r', 10).style('fill', 'red');
@@ -205,22 +208,21 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
   }
 
   private buildLegend() {
-
     this.legend = d3.select('#chartline').append('div')
       .attr('class', 'legend');
-
 
     this.legend.selectAll('legend')
     .data(this.series)
     .enter()
     .append('div')
     .attr('class', 'legend-item')
-    .each(function(d, i) {
-      const p = d3.select(this);
+    .each((d, i, n) => {
+      const color = this.setColor();
+      const p = d3.select(n[i]);
 
       p.append('span')
       .attr('class', 'key-dot')
-      .style('background', () => '#00b28e');
+      .style('border-color', color[i]);
 
       p.append('p')
       .attr('class', 'legend-text')
@@ -228,5 +230,39 @@ export class ChartLine2Component implements OnInit, AfterContentInit {
       });
   }
 
+  setColor() {
+    if (this.series) {
+      let index = this.series.length - 1;
+
+      index = index >= 12 ? 11 : index;
+      return ThfChartColors[index];
+    }
+
+    return ThfChartColors[11];
+}
+
+
+
 
 }
+
+
+// if (this.series) {
+//   const chart = this.typeChart;
+//   let index = this.series.length - 1;
+
+//   if (chart === 'donut' || chart === 'funnel' || chart === 'pie') {
+//     // Caso for donut, funnel ou pie utiliza a propriedade data para recuperar o index.
+//     const dataSeries = this.series[index].data;
+//     const dataSerieIndex = dataSeries.length - 1;
+
+//     return ThfChartColors[dataSerieIndex];
+//   }
+
+//   // Caso houver 12 ou mais series define o index como 11.
+//   index = index >= 12 ? 11 : index;
+//   return ThfChartColors[index];
+// }
+
+// return ThfChartColors[11];
+// }

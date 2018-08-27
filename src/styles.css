@@ -82,10 +82,12 @@ div.tooltip:after {
 
 .key-dot {
   display: inline-block;
-  height: 10px;
+  height: 16px;
   margin-right: .5em;
-  width: 10px;
-  border-radius: 10px;
+  width: 16px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 16px;
 }
 
 .legend {
@@ -94,6 +96,10 @@ div.tooltip:after {
 
 .legend-item {
   display: inline-block;
+}
+
+.legend-text {
+  font-size: 12px;
 }
 
 .legend-item:not(:first-child) {
