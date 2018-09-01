@@ -1,116 +1,253 @@
-import { Component, AfterContentInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+
+import { ChartLineService } from './chart-line.service';
+import { ThfChartColors } from './../commons/thf-chart-colors';
 
 import * as d3 from 'd3';
+import * as d3Scale from 'd3-scale';
+import * as d3ScaleChromatic from 'd3-scale-chromatic';
+import * as d3Shape from 'd3-shape';
+import * as d3Array from 'd3-array';
+import * as d3Axis from 'd3-axis';
 
 @Component({
   selector: 'app-chart-line',
   templateUrl: './chart-line.component.html',
-  styleUrls: ['./chart-line.component.css']
+  styleUrls: ['./chart-line.component.css'],
+  providers: [ChartLineService]
 })
-export class ChartLineComponent implements AfterContentInit {
-
-  h:number = 400;
-  w:number = 680;
-  totalValue = 0;
-  labels;
-  lineFun;
+export class ChartLineComponent implements OnInit {
+  
+  categories;
+  series;
+  margin = { top: 32, right: 16, bottom: 56, left: 64 };
+  height;
+  width;
+  xScale;
+  yScale;
+  g;
   svg;
-  viz;
+  xAxis;
+  yAxis;
+  line;
+  dots;
+  data;
+  color;
 
-  monthSales = [
-    {'month': 10, 'sales': 100},
-    {'month': 20, 'sales': 130},
-    {'month': 30, 'sales': 250},
-    {'month': 40, 'sales': 300},
-    {'month': 50, 'sales': 265},
-    {'month': 60, 'sales': 225},
-    {'month': 70, 'sales': 180},
-    {'month': 80, 'sales': 120},
-    {'month': 90, 'sales': 145},
-    {'month': 100, 'sales': 130}
-  ];
+  xScaleData;
 
-  xScale = d3.scaleLinear()
-  .domain([10, 100])
-  .range([0, this.w]);
+  @HostListener('window:resize', ['$event'])
+    onResize(event) {
+      d3.select('svg').remove();
 
-  yScale = d3.scaleLinear()
-      .range([this.h, 0]);
+      this.initChart();
+      this.drawAxis();
+      this.drawLines();
+      // this.drawDots();
+  }
 
-  constructor() { }
+  constructor(private chartLineService: ChartLineService) {}
 
-  ngAfterContentInit() {
-
-    this.lineFun = d3.line()
-        .x((d:any) => this.xScale(d.month))
-        .y((d:any) => this.h - d.sales)
-        .curve(d3.curveLinear);
+  ngOnInit() {
+    this.data = this.chartLineService.getData()
+    this.color = this.setColor();
     
-  
-    this.svg = d3.select('#chartline')
-                  .append('svg')
-                  .attr('width', this.w)
-                  .attr('height', this.h);
-    
-    this.viz = this.svg.append('path')
-                  .attr('d', this.lineFun(this.monthSales))
-                  .attr('stroke', 'purple')
-                  .attr('stroke-width', 2)
-                  .attr('fill', 'none');
-    
-    this.labels = this.svg.selectAll('text')
-                          .data(this.monthSales)
-                          .enter()
-                          .append('text')
-                          .text(d => d.sales)
-                          .attr('x', d => this.xScale(d.month - 2))
-                          .attr('y', d => this.h - d.sales - 10)
-                          .attr('font-family', 'sans-serif')
-                          .attr('fill', '#666666')
-                          .attr('text-anchor', 'start')
-                          .attr('dy', '.35em')
-                          .attr('font-size', 14)
-                          .attr('font-weight', (d, i) => {
-                            if (i === 0 || i === ( this.monthSales.length - 1 )) {
-                              return 'bold';
-                            } else {
-                              return 'normal';
-                            }
-                          });
-  
-    this.showTotals();
-    }
-  
-    showTotals() {
-      const t = d3.select('#chartline').append('table');
-  
-      this.monthSales.map(d =>  {
-        this.totalValue = this.totalValue + d.sales;
-      });
-  
-      const tr = t.selectAll('tr')
-                .data([1])
-                .enter()
-                .append('tr')
-                .append('td')
-                .text('Sales Total:' + this.totalValue);
-    }
+    this.xScaleData = this.data.map(serie => serie.monthlySales.map(data => data.month))[0];
 
-
-
+    this.initChart();
+    this.drawAxis();
+    this.drawLines();
+    // this.drawDots();
 
   }
+
+  initChart() {
+    this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
+    this.height = 300 - this.margin.top - this.margin.bottom;
+
+    this.xScale = d3.scalePoint()
+    .domain(this.xScaleData.map(data => {return data}))
+    .range([0, this.width]);
+
+    this.yScale = d3.scaleLinear()
+    .domain([0, this.getCategorieMaxValue()])
+    .range([this.height, 0]);
+
+    this.line = d3Shape.line()
+    .curve(d3.curveLinear)
+    .x( (d: any) => this.xScale(d.month) )
+    .y( (d: any) => this.yScale(d.sales) );
+
+    this.svg = d3.select('#chartline').append('svg')
+      .attr('width', this.width + this.margin.left + this.margin.right)
+      .attr('height', this.height + this.margin.top + this.margin.bottom)
+
+    this.g = this.svg.append('g').attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+  }
+
+  private drawAxis() {
+
+    this.xAxis = this.g.append('g')
+      .attr('class', 'axis axis--x')
+      .attr('transform', `translate(0, ${this.height})`)
+      .call(d3Axis.axisBottom(this.xScale)
+        .tickSize(-this.height))
+      .selectAll('text')
+      .attr('x', -10)
+      .attr('y', 15)
+      .style('text-anchor', 'start');
+
+    this.yAxis = this.g.append('g')
+      .attr('class', 'axis axis--y')
+      .call(d3.axisLeft(this.yScale)
+        .ticks(4)
+        .tickSize(-this.width))
+      .selectAll('text')
+      .attr('x', - 40)
+      .attr('y', 0)
+      .style('text-anchor', 'start');
+  }
+
+  private drawLines() {
+    let serieLineItem = this.g.selectAll('.serie-line-item')
+      .data(this.data)
+      .enter()
+      .append('g')
+      .attr('class', 'serie-line-item');
+
+    serieLineItem.append('path')
+      .attr('class', 'line')
+      .attr('d', (d) => this.line(d.monthlySales))
+      .attr('stroke', (d, i) => this.color[i])
+      .attr('stroke-width', 2)
+      .attr('fill', 'none');
+
+    this.color.map((color, i) => {
+      console.log(color);
+      serieLineItem.append('g').selectAll('circle')
+      .data(d => d.monthlySales)
+      .enter()
+      .append('circle')
+      .attr('cx', dd => this.xScale(dd.month))
+      .attr('cy', dd =>  this.yScale(dd.sales))
+      .attr('r', '5')
+      .attr('fill', '#ffffff')
+      .attr('stroke', color)
+      .attr('stroke-width', 2)
+    })
+
+  }
+
+
+  // private drawDots() {
+
+  //   console.log(this.data)
+  //   let serieLineDotItem = this.g.selectAll('.dot')
+  //     .data(this.data)
+  //     .enter()
+  //     .append('g')
+  //     .attr('class', 'serie-line-dot-item');
+
+  //   serieLineDotItem.append('circle')
+  //     .attr('cx', '30')
+  //     .attr('cy', '30')
+
+      // .attr('cx', serieItem => serieItem.monthlySales.map(month => this.xScale(month.month) )  )
+      // .attr('cy', serieItem => serieItem.monthlySales.map(month => this.xScale(month.sales) )  )
+
+
+
+    // serieLineDotItem.append('circle')
+    //   .attr('cx', (d: any) => this.xScale(d.monthlySales.month))
+    //   .attr('cy', (d: any) => this.yScale(d.monthlySales.sales))
+    //   .attr('r', '5')
+    //   .attr('fill', '#ffffff')
+    
+    
+    // .attr('stroke', this.color[i])
+    // .attr('stroke-width', 2)
+    // .on('mouseover', d => {
+    //   // d3.select(this.).attr('r', 10).style('fill', 'red');
+    //   this.tooltip.transition()
+    //     .duration(200)
+    //     .style('opacity', .9);
+    //   this.tooltip.html(d.dataX)
+    //     .style('left', this.xScale(d.dataY) + this.margin.left - 12 + 'px')
+    //     .style('top', this.yScale(d.dataX) - 12 + 'px');
+    //   })
+    // .on('mouseout', () => {
+    //   this.tooltip.transition()
+    //     .duration(500)
+    //     .style('opacity', 0);
+    //   });
   
 
 
-        // this.line2 = d3.line()
-      // .x((d: any) => this.xScale(d.month))
-      // .y((d: any) => this.yScale(d.exports))
-      // .curve(d3.curveLinear);
 
-      // this.viz2 = this.svg.
-      // append('path')
-      // .attr('d', this.line2(this.monthimports))
-      // .attr('stroke', '#c64840')
-      // .attr('stroke-this.width', 2)
-      // .attr('fill', 'none');
+
+  setColor() {
+    if (this.data) {
+      let index = this.data.length - 1;
+
+      index = index >= 12 ? 11 : index;
+      return ThfChartColors[index];
+    }
+
+    return ThfChartColors[11];
+  }
+    
+
+
+
+
+    // this.valueLine = d3.line()
+    // .x((d:any) => this.xScale(d.dataY))
+    // .y((d:any) => this.yScale(d.dataX))
+    // .curve(d3.curveLinear);
+
+    // this.line = this.svg
+    // .append('g')
+    // .attr('class', 'line-item')
+    // .append('path')
+    // .attr('d', this.valueLine(serieData))
+    // .attr('stroke', this.color[i])
+    // .attr('stroke-width', 2)
+    // .attr('fill', 'none');
+
+    // this.buildDots(serieData, i);
+
+  
+
+//   private drawPath(): void {
+//     let city = this.g.selectAll('.city')
+//         .data(TEMPERATURES)
+//         .enter().append('g')
+//         .attr('class', 'city');
+
+//     city.append('path')
+//         .attr('class', 'line')
+//         .attr('d', (d) => this.line(d.values) )
+//         .style('stroke', (d) => this.z(d.id) );
+
+//     city.append('text')
+//         .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+//         .attr('transform', (d) => 'translate(' + this.x(d.value.date) + ',' + this.y(d.value.temperature) + ')' )
+//         .attr('x', 3)
+//         .attr('dy', '0.35em')
+//         .style('font', '10px sans-serif')
+//         .text(function(d) { return d.id; });
+// }
+
+
+  private getCategorieMaxValue(): number {
+    let maxX = 0;
+
+    this.data.map(serie => {
+      serie.monthlySales.filter(monthData => {
+        return maxX = monthData.sales >= maxX ? monthData.sales : maxX;
+      });
+    });
+    return maxX;
+  };
+
+}
