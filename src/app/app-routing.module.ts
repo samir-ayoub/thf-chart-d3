@@ -3,10 +3,12 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { ChartLineComponent } from './chart-line/chart-line.component';
+import { ChartBarComponent } from './chart-bar/chart-bar.component';
 
 const routes: Routes = [
   { path: 'chart-line', component: ChartLineComponent },
-  { path: 'chart-line2', component: ChartLine2Component }
+  { path: 'chart-line2', component: ChartLine2Component },
+  { path: 'chart-bar', component: ChartBarComponent }
 ];
 
 @NgModule({
