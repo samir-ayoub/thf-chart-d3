@@ -9,7 +9,7 @@ export class AppComponent {
 
   menus = [
     { label: 'Chart Line', link: './chart-line' },
-    { label: 'Chart Line2', link: './chart-line2' },
+    // { label: 'Chart Line2', link: './chart-line2' },
     { label: 'Chart Bar', link: './chart-bar' },
   ];
 

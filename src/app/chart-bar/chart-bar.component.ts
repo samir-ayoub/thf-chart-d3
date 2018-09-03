@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import * as d3 from 'd3';
 
-import { MONTHLYSALES } from '../shared/imports';
+import { PRODUCTSALE } from '../shared/imports';
 
 import { ThfChartColors } from '../commons/thf-chart-colors';
 
@@ -15,6 +15,7 @@ export class ChartBarComponent implements OnInit {
 
   data;
   xScaleData;
+  x1teste;
   color;
   width: number;
   margin = { top: 32, right: 16, bottom: 56, left: 64 };
@@ -26,13 +27,14 @@ export class ChartBarComponent implements OnInit {
   g: any;
   xAxis: any;
   yAxis: any;
+  bar;
 
   constructor() { }
 
   ngOnInit() {
     this.color = this.setColor();
     
-    this.xScaleData = MONTHLYSALES.map(serie => serie.monthlySales.map(data => data.month))[0];
+    this.xScaleData = PRODUCTSALE.map(serie => serie.monthlySales.map(data => data.month))[0];
       
     this.initChart();
     this.drawAxis();
@@ -45,9 +47,17 @@ export class ChartBarComponent implements OnInit {
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
 
+    // this.x0.domain(data.map(function(d) { return d.State; }));
+
     this.xScale = d3.scaleBand()
-    .domain(this.xScaleData.map(data => {return data}))
-    .range([0, this.width]);
+    .rangeRound([0, this.width])
+    .domain(this.xScaleData.map(data => {return data}));
+    // .range([0, this.width]);
+
+    this.x1teste = d3.scaleBand()
+    .domain(this.xScaleData)
+    .rangeRound([0, this.xScale.bandwidth()])
+    .padding(0.05);
 
     this.yScale = d3.scaleLinear()
     .domain([0, this.getCategorieMaxValue()])
@@ -88,27 +98,33 @@ export class ChartBarComponent implements OnInit {
   }
 
   drawBars() {
-    let serieBarItem = this.g.selectAll('bar')
-      .data(MONTHLYSALES)
+    console.log(PRODUCTSALE);
+
+    this.bar = this.g.selectAll('bars-group')
+      .data(PRODUCTSALE)
       .enter()
       .append('g')
-      .attr('class', 'serie-bar-item');
+      .attr('class', 'serie-bar-group')
+      .attr('fill', (d, i) => this.color[i]);
 
-    serieBarItem.append('rect')
-    .attr('class', 'bar')
-    .attr('x', (d) => this.xScale(d.month) )
-    .attr('y', (d) => this.yScale(d.sales) )
-    .attr('width', this.xScale.bandwidth())
-    .attr('height', (d) => this.height - this.yScale(d.sales) );
+    this.bar.selectAll('rect')
+      .data(d => d.monthlySales)
+      .enter()
+      .append('rect')
+      .attr('class', 'bar')
+      .attr('x', (d, i) => this.x1teste(d.month) )
+      .attr('y', (d) => this.yScale(d.sales) )
+      .attr('width', (d) => this.x1teste.bandwidth(d.sales))
+      .attr('height', (d) => this.height - this.yScale(d.sales) );
+
 
   }
 
-  // serieLineItem.append('path')
-  // .attr('class', 'line')
-  // .attr('d', (d) => this.line(d.monthlySales))
-  // .attr('stroke', (d, i) => this.color[i])
-  // .attr('stroke-width', 2)
-  // .attr('fill', 'none');
+
+  // this.line = d3.line()
+  // .curve(d3.curveLinear)
+  // .x( (d: any) => this.xScale(d.month) )
+  // .y( (d: any) => this.yScale(d.sales) );
 
 
 //   private drawBars() {
@@ -124,8 +140,8 @@ export class ChartBarComponent implements OnInit {
 
 
   setColor() {
-    if (MONTHLYSALES) {
-      let index = MONTHLYSALES.length - 1;
+    if (PRODUCTSALE) {
+      let index = PRODUCTSALE.length - 1;
 
       index = index >= 12 ? 11 : index;
       return ThfChartColors[index];
@@ -138,7 +154,7 @@ export class ChartBarComponent implements OnInit {
   private getCategorieMaxValue(): number {
     let maxX = 0;
 
-    MONTHLYSALES.map(serie => {
+    PRODUCTSALE.map(serie => {
       serie.monthlySales.filter(monthData => {
         return maxX = monthData.sales >= maxX ? monthData.sales : maxX;
       });

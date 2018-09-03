@@ -63,9 +63,9 @@ export class ChartLineComponent implements OnInit {
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
 
-    this.xScale = d3.scaleBand()
-    .domain(this.xScaleData.map(data => {return data}))
-    .range([0, this.width]);
+    this.xScale = d3.scalePoint()
+    .domain(this.xScaleData.map(categorie => {return categorie}))
+        .range([0, this.width]);
 
     this.yScale = d3.scaleLinear()
     .domain([0, this.getCategorieMaxValue()])

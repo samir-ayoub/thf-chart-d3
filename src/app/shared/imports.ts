@@ -1,4 +1,4 @@
-export const MONTHLYSALES: Array<any> = [
+export const PRODUCTSALE: Array<any> = [
       { name: 'Video Game',
         monthlySales: [
           {month: 'Jan', sales: 100},
