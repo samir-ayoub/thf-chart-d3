@@ -32,6 +32,7 @@ export class ChartBarComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(PRODUCTSALE)
     this.color = this.setColor();
     
     this.xScaleData = PRODUCTSALE.map(serie => serie.monthlySales.map(data => data.month))[0];
@@ -112,9 +113,9 @@ export class ChartBarComponent implements OnInit {
       .enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('x', (d, i) => this.x1teste(d.month) )
+      .attr('x', (d, i) => this.xScale(d.month) )
       .attr('y', (d) => this.yScale(d.sales) )
-      .attr('width', (d) => this.x1teste.bandwidth(d.sales))
+      .attr('width', (d) => this.xScale.bandwidth())
       .attr('height', (d) => this.height - this.yScale(d.sales) );
 
 
