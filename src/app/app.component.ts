@@ -11,6 +11,7 @@ export class AppComponent {
     { label: 'Chart Line', link: './chart-line' },
     // { label: 'Chart Line2', link: './chart-line2' },
     { label: 'Chart Bar', link: './chart-bar' },
+    { label: 'Pie Bar', link: './chart-pie' },
   ];
 
 }

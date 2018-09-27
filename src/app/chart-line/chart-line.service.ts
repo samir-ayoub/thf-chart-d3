@@ -111,7 +111,6 @@ export class ChartLineService {
     ];
   }
   
-
   constructor() { }
 
 }
