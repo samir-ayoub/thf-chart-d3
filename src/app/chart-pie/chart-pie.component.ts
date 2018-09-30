@@ -125,3 +125,5 @@ export class ChartPieComponent implements OnInit {
           .text(d);
       });
   }
+
+}

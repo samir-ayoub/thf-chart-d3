@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 
 import { PRODUCTSALE } from '../shared/imports';
 
-import { ThfChartColors } from '../commons/thf-chart-colors';
+import { ThfChartColors } from '../commons/utils';
 
 @Component({
   selector: 'app-chart-bar',
