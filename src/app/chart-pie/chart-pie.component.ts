@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 
+import { setColor } from '../commons/thf-chart-colors'
 
 @Component({
   selector: 'app-chart-pie',
@@ -8,116 +9,120 @@ import * as d3 from 'd3';
   styleUrls: ['./chart-pie.component.css']
 })
 export class ChartPieComponent implements OnInit {
+
   arc;
+  categories;
+  color;
   data;
   g;
+  height;
+  legend;
+  label;
+  labelArc;
+  margin = { top: 16, right: 16, bottom: 16, left: 16 };
+  path;
   pie;
-  color = ['#f44842', '#f4b841', '#f4f141', '#46f441', '#41f4d9', '#4941f4', '#f441d6'];
-  margin = { top: 32, right: 16, bottom: 56, left: 64 };
+  pieChart;
   radius;
   svg;
-  label;
   width;
-  height;
-  pathArea;
-  path;
 
-
-  constructor() {
-
-  }
+  constructor() { }
 
   ngOnInit() {
-    this.data = [
-      { city: 'Deesa', beautifulRatio: 30 },
-      { city: 'Patan', beautifulRatio: 20 },
-      { city: 'Ahmedabad', beautifulRatio: 15 },
-      { city: 'Bhabhar', beautifulRatio: 35 },
-      { city: 'BHakhasar', beautifulRatio: 50 }];
+    this.initChart();
+    this.drawPath();
+    // this.drawLabels();
+    this.drawLegend();
+  }
+
+  initChart() {
+    this.categories = ['Sudeste', 'Sul', 'Nordeste,', 'Centro-Oeste', 'Norte'];
+    this.data = [39, 26, 17, 11, 7];
+
+    this.color = setColor(this.data);
 
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
-    this.height = 300 - this.margin.top - this.margin.bottom;
+    this.height = 300;
     this.radius = Math.min(this.width, this.height) / 2;
 
     this.path = d3.arc()
       .outerRadius(this.radius - 20)
-      .innerRadius(0)
-      .cornerRadius(5);
+      .innerRadius(0);
+
+    this.labelArc = d3.arc()
+      .outerRadius(this.radius)
+      .innerRadius(0);
+
+    this.pie = d3.pie().sort(null).value(function (d: any) { return d; });
 
     this.svg = d3.select('.svg').append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom);
+      .attr('height', this.height);
 
-    this.g = this.svg.append('g')
-      .attr('transform', 'translate(' + (this.width / 2) + ',' + (this.height / 2) + ')');
-
-
-    this.pie = d3.pie().sort(null).value(function (d: any) { return d.beautifulRatio; });
-
-    this.arc = this.g.selectAll('.arc')
-      .data(this.pie(this.data))
-      .enter().append('g')
-      .classed('arc', true);
-
-    this.label = d3.arc()
-      .outerRadius(this.radius - 40)
-      .innerRadius(this.radius - 40);
-
-
-    this.drawPath();
-
-    this.drawLabels();
+    this.pieChart = this.svg.append('g')
+      .attr('transform', 'translate(' + ((this.width + this.margin.left + this.margin.right) / 2) + ',' + ((this.height) / 2) + ')');
   }
 
   drawPath() {
     const color = this.color;
-    this.pathArea = this.arc.append('path')
+    const tooltip = d3.select('.tooltip');
+
+    this.pieChart.selectAll('path')
+      .data(this.pie(this.data))
+      .enter()
+      .append('path')
       .attr('d', this.path)
       .attr('id', function (d, i) {
         return 'arc-' + i;
       })
-      .attr('style', 'fill-opacity: 0.85;')
       .attr('fill', function (d, i) {
         return color[i];
       })
-      .attr('data', function (d) {
-        d.data['percentage'] = (d.endAngle - d.startAngle) / (2 * Math.PI) * 100;
-        return JSON.stringify(d.data);
-      });
-
+      .on('mouseover', (d, i) => {
+        tooltip.transition()
+          .duration(200)
+          .style('opacity', .9);
+        tooltip.html(d.data)
+          .style('left', `${(document.getElementById('chartline').offsetWidth - 60) / 2}px`)
+          .style('top', `-32px`)
+      })
+      .on('mouseout', () => {
+        tooltip.transition()
+          .duration(500)
+          .style('opacity', 0);
+      })
   }
 
   drawLabels() {
-
-
-    this.arc.append('text')
-        .data(this.data)
-        .attr('transform', function(d) {
-          let centroid = this.arc.centroid(d);
-          console.log(centroid);
-            d3.select(this)
-            .attr('x', centroid[0])
-            .attr('y', centroid[1])
-            .attr('dy', '0.33em')
-            .text(d.label);
-        })
-        .attr('dy', '0.35em')
-        .text(function(d) {
-            return d.beautifulRatio;
-        });
+    this.pieChart.selectAll('text')
+      .data(this.pie(this.data))
+      .enter()
+      .append("text")
+      .attr('transform', (d) => 'translate(' + this.labelArc.centroid(d) + ')')
+      .attr('dy', '.35em')
+      .text(function (d) { return d.data; });
   }
 
-}
+  drawLegend() {
+    this.legend = d3.select('.legend');
 
-// d3.select('g')
-// 	.selectAll('text')
-// 	.data(arcData)
-// 	.enter()
-// 	.append('text')
-// 	.each(function(d) {
-// 		var centroid = arcGenerator.centroid(d);
-// 		d3.select(this)
-// 			.attr('x', centroid[0])
-// 			.attr('y', centroid[1])
-// 			.attr('dy', '0.33em')
-// 			.text(d.label);
+    this.legend.selectAll('legend')
+      .data(this.categories)
+      .enter()
+      .append('div')
+      .attr('class', 'legend-item')
+      .each((d, i, n) => {
+        const color = this.color;
+        const p = d3.select(n[i]);
+
+        p.append('span')
+          .attr('class', 'key-square')
+          .style('background-color', color[i]);
+
+        p.append('p')
+          .attr('class', 'legend-text')
+          .text(d);
+      });
+  }
+  

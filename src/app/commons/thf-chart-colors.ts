@@ -12,3 +12,13 @@ export const ThfChartColors = [
   ['#00CBE4', '#00BAD5', '#00A7C7', '#0197B8', '#0088AC', '#23789F', '#2B6992', '#315C87', '#364E7C', '#36436F', '#32285C'],
   ['#00CBE4', '#00BAD5', '#00A7C7', '#0197B8', '#0088AC', '#23789F', '#2B6992', '#315C87', '#364E7C', '#36436F', '#333565', '#32285C'],
 ];
+
+export function setColor(data) {
+  if (data) {
+    let index = data.length - 1;
+
+    index = index >= 12 ? 11 : index;
+    return ThfChartColors[index];
+  }
+  return ThfChartColors[11];
+}
