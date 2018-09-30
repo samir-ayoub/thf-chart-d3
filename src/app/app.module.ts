@@ -9,6 +9,8 @@ import { ChartLineComponent } from './chart-line/chart-line.component';
 import { ChartLine2Component } from './chart-line-2/chart-line-2.component';
 import { ChartBarComponent } from './chart-bar/chart-bar.component';
 import { ChartPieComponent } from './chart-pie/chart-pie.component';
+import { ChartDonutComponent } from './chart-donut/chart-donut.component';
+import { ChartBar2Component } from './chart-bar2/chart-bar2.component';
 
 
 @NgModule({
@@ -17,7 +19,9 @@ import { ChartPieComponent } from './chart-pie/chart-pie.component';
     ChartLineComponent,
     ChartLine2Component,
     ChartBarComponent,
-    ChartPieComponent
+    ChartPieComponent,
+    ChartDonutComponent,
+    ChartBar2Component
   ],
   imports: [
     BrowserModule,

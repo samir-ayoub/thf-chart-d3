@@ -7,16 +7,17 @@ import { PRODUCTSALE } from '../shared/imports';
 import { ThfChartColors } from '../commons/utils';
 
 @Component({
-  selector: 'app-chart-bar',
-  templateUrl: './chart-bar.component.html',
-  styleUrls: ['./chart-bar.component.css']
+  selector: 'app-chart-bar2',
+  templateUrl: './chart-bar2.component.html',
+  styleUrls: ['./chart-bar2.component.css']
 })
-export class ChartBarComponent implements OnInit {
+export class ChartBar2Component implements OnInit {
 
   data;
   xScaleData;
   x1Scale;
   color;
+  keys;
   width: number;
   margin = { top: 32, right: 16, bottom: 56, left: 64 };
   xScale;
@@ -29,16 +30,24 @@ export class ChartBarComponent implements OnInit {
   yAxis: any;
   bar;
 
-  categories = [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  keys;
 
-  constructor() { }
+  categories = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  series = [
+    { 'Month': 'Jan', 'Video Game': 270, 'Notebook': 449, 'Cellphone': 270, 'Tablet': 70 },
+    { 'Month': 'Feb', 'Video Game': 202, 'Notebook': 327, 'Cellphone': 160, 'Tablet': 90 },
+    { 'Month': 'Mar', 'Video Game': 120, 'Notebook': 214, 'Cellphone': 180, 'Tablet': 129 },
+    { 'Month': 'Abr', 'Video Game': 114, 'Notebook': 193, 'Cellphone': 290, 'Tablet': 68 },
+    { 'Month': 'Mai', 'Video Game': 894, 'Notebook': 155, 'Cellphone': 320, 'Tablet': 189 },
+    { 'Month': 'Jun', 'Video Game': 737, 'Notebook': 134, 'Cellphone': 340, 'Tablet': 147 }
+  ];
+
 
   ngOnInit() {
     this.color = this.setColor();
-    
+
     this.xScaleData = PRODUCTSALE.map(serie => serie.monthlySales.map(data => data.month))[0];
-      
+
+    this.keys = Object.keys(this.series[0]).slice(1);
     this.initChart();
     this.drawAxis();
     this.drawBars();
@@ -48,34 +57,25 @@ export class ChartBarComponent implements OnInit {
 
   initChart() {
 
-    this.keys = Object.keys(PRODUCTSALE);
-
     this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
     this.height = 300 - this.margin.top - this.margin.bottom;
 
-    // this.x0.domain(data.map(function(d) { return d.State; }));
-
     this.xScale = d3.scaleBand()
-    .rangeRound([0, this.width])
-    .domain(this.categories.map(categorie => categorie));
-    // .range([0, this.width]);
-
-
-
+      .rangeRound([0, this.width])
+      .domain(this.series.map(d => d.Month));
 
     this.x1Scale = d3.scaleBand()
-    .domain(this.keys)
-    .rangeRound([0, this.xScale.bandwidth()]);
-
+      .domain(this.keys)
+      .rangeRound([0, this.xScale.bandwidth()]);
 
     this.yScale = d3.scaleLinear()
-    .domain([0, this.getCategorieMaxValue()])
-    .range([this.height, 0]);
+      .domain([0, this.getCategorieMaxValue()])
+      .range([this.height, 0]);
 
     this.line = d3.line()
-    .curve(d3.curveLinear)
-    .x( (d: any) => this.xScale(d.month) )
-    .y( (d: any) => this.yScale(d.sales) );
+      .curve(d3.curveLinear)
+      .x((d: any) => this.xScale(d.month))
+      .y((d: any) => this.yScale(d.sales));
 
     this.svg = d3.select('.svg').append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
@@ -107,46 +107,24 @@ export class ChartBarComponent implements OnInit {
   }
 
   drawBars() {
+    this.bar = this.g.append("g")
+      .selectAll("g")
+      .data(this.series)
+      .enter().append("g")
+      .attr("transform", (d) => "translate(" + this.xScale(d.Month) + ",0)");
 
-
-    this.bar = this.g.selectAll('bars-group')
-      .data(PRODUCTSALE)
-      .enter()
-      .append('g')
-      .attr('class', 'serie-bar-group')
-      .attr('fill', (d, i) => this.color[i]);
-
-    this.bar.selectAll('rect')
-      .data(d => {console.log(d); return d.monthlySales})
-      .enter()
-      .append('rect')
-      .attr('class', 'bar')
-      .attr('x', (d, i) => this.x1Scale() )
-      .attr('y', (d) => this.yScale(d.sales) )
-      .attr('width', (d) => this.x1Scale.bandwidth())
-      .attr('height', (d) => this.height - this.yScale(d.sales) );
-
+    this.bar.selectAll("rect")
+    .data((d) => this.keys.map((key) => { 
+        return { key: key, value: d[key] }; 
+         }))
+      .enter().append("rect")
+      .attr("x", (d) => this.x1Scale(d.key))
+      .attr("y", (d) => this.yScale(d.value))
+      .attr("width", this.x1Scale.bandwidth())
+      .attr("height", (d) => this.height - this.yScale(d.value))
+    .attr('fill', (d, i) => this.color[i]);
 
   }
-
-
-  // this.line = d3.line()
-  // .curve(d3.curveLinear)
-  // .x( (d: any) => this.xScale(d.month) )
-  // .y( (d: any) => this.yScale(d.sales) );
-
-
-//   private drawBars() {
-//     this.g.selectAll('.bar')
-//         .data(STATISTICS)
-//         .enter().append('rect')
-//         .attr('class', 'bar')
-//         .attr('x', (d) => this.x(d.letter) )
-//         .attr('y', (d) => this.y(d.frequency) )
-//         .attr('width', this.x.bandwidth())
-//         .attr('height', (d) => this.height - this.y(d.frequency) );
-// }
-
 
   setColor() {
     if (PRODUCTSALE) {
@@ -158,8 +136,6 @@ export class ChartBarComponent implements OnInit {
     return ThfChartColors[11];
   }
 
-
-  
   private getCategorieMaxValue(): number {
     let maxX = 0;
 

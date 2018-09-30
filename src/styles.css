@@ -106,3 +106,12 @@ div.tooltip:after {
 .legend-text {
   display: inline-block;
 }
+
+.highlight-data {
+  font-size: 24px;
+}
+
+.highlight-data-legend {
+  color: #4a5c60;
+  font-size: 12px;
+}
