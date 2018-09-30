@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 
 import { ChartLineService } from './chart-line.service';
-import { ThfChartColors } from './../commons/thf-chart-colors';
+import { ThfChartColors } from './../commons/utils';
 
 import * as d3 from 'd3';
 import * as d3Scale from 'd3-scale';

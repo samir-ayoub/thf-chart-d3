@@ -2,7 +2,7 @@ import { Component, OnInit, AfterContentInit } from '@angular/core';
 
 import * as d3 from 'd3';
 
-import { ThfChartColors } from './../commons/thf-chart-colors';
+import { ThfChartColors } from './../commons/utils';
 import { ChartLineService } from './chart-line.service';
 
 @Component({
