@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 
 import * as d3 from 'd3';
 
@@ -13,11 +13,13 @@ import { ThfChartColors } from '../commons/utils';
 })
 export class ChartBar2Component implements OnInit {
 
+  bar;
   data;
   xScaleData;
   x1Scale;
   color;
   keys;
+  legend;
   width: number;
   margin = { top: 32, right: 16, bottom: 56, left: 64 };
   xScale;
@@ -28,7 +30,6 @@ export class ChartBar2Component implements OnInit {
   g: any;
   xAxis: any;
   yAxis: any;
-  bar;
 
 
   categories = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,6 +42,16 @@ export class ChartBar2Component implements OnInit {
     { 'Month': 'Jun', 'Video Game': 737, 'Notebook': 134, 'Cellphone': 340, 'Tablet': 147 }
   ];
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    d3.select('svg').remove();
+
+    this.initChart();
+    this.drawAxis();
+    this.drawBars();
+}
+
+
 
   ngOnInit() {
     this.color = this.setColor();
@@ -52,7 +63,7 @@ export class ChartBar2Component implements OnInit {
     this.drawAxis();
     this.drawBars();
     // this.drawDots();
-    // this.drawLegend();
+    this.drawLegend();
   }
 
   initChart() {
@@ -66,7 +77,8 @@ export class ChartBar2Component implements OnInit {
 
     this.x1Scale = d3.scaleBand()
       .domain(this.keys)
-      .rangeRound([0, this.xScale.bandwidth()]);
+      .rangeRound([0, this.xScale.bandwidth()])
+      .paddingOuter(8);
 
     this.yScale = d3.scaleLinear()
       .domain([0, this.getCategorieMaxValue()])
@@ -114,16 +126,38 @@ export class ChartBar2Component implements OnInit {
       .attr("transform", (d) => "translate(" + this.xScale(d.Month) + ",0)");
 
     this.bar.selectAll("rect")
-    .data((d) => this.keys.map((key) => { 
-        return { key: key, value: d[key] }; 
-         }))
+      .data((d) => this.keys.map((key) => {
+        return { key: key, value: d[key] };
+      }))
       .enter().append("rect")
       .attr("x", (d) => this.x1Scale(d.key))
       .attr("y", (d) => this.yScale(d.value))
       .attr("width", this.x1Scale.bandwidth())
       .attr("height", (d) => this.height - this.yScale(d.value))
-    .attr('fill', (d, i) => this.color[i]);
+      .attr('fill', (d, i) => this.color[i]);
 
+  }
+
+  drawLegend() {
+    this.legend = d3.select('.legend');
+
+    this.legend.selectAll('legend')
+      .data(this.keys)
+      .enter()
+      .append('div')
+      .attr('class', 'legend-item')
+      .each((d, i, n) => {
+        const color = this.color;
+        const p = d3.select(n[i]);
+
+        p.append('span')
+          .attr('class', 'key-square')
+          .style('background-color', color[i]);
+
+        p.append('p')
+          .attr('class', 'legend-text')
+          .text(d);
+      });
   }
 
   setColor() {
@@ -145,6 +179,6 @@ export class ChartBar2Component implements OnInit {
       });
     });
     return maxX;
-  };
+  }
 
 }
