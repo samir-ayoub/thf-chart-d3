@@ -62,7 +62,6 @@ export class ChartBar2Component implements OnInit {
     this.initChart();
     this.drawAxis();
     this.drawBars();
-    // this.drawDots();
     this.drawLegend();
   }
 
@@ -91,7 +90,7 @@ export class ChartBar2Component implements OnInit {
 
     this.svg = d3.select('.svg').append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom)
+      .attr('height', this.height + this.margin.top + this.margin.bottom);
 
     this.g = this.svg.append('g').attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
   }
@@ -119,21 +118,21 @@ export class ChartBar2Component implements OnInit {
   }
 
   drawBars() {
-    this.bar = this.g.append("g")
-      .selectAll("g")
+    this.bar = this.g.append('g')
+      .selectAll('g')
       .data(this.series)
-      .enter().append("g")
-      .attr("transform", (d) => "translate(" + this.xScale(d.Month) + ",0)");
+      .enter().append('g')
+      .attr('transform', (d) => 'translate(' + this.xScale(d.Month) + ',0)');
 
-    this.bar.selectAll("rect")
+    this.bar.selectAll('rect')
       .data((d) => this.keys.map((key) => {
         return { key: key, value: d[key] };
       }))
-      .enter().append("rect")
-      .attr("x", (d) => this.x1Scale(d.key))
-      .attr("y", (d) => this.yScale(d.value))
-      .attr("width", this.x1Scale.bandwidth())
-      .attr("height", (d) => this.height - this.yScale(d.value))
+      .enter().append('rect')
+      .attr('x', (d) => this.x1Scale(d.key))
+      .attr('y', (d) => this.yScale(d.value))
+      .attr('width', this.x1Scale.bandwidth())
+      .attr('height', (d) => this.height - this.yScale(d.value))
       .attr('fill', (d, i) => this.color[i]);
 
   }

@@ -90,7 +90,7 @@ export class ChartLineService {
           {month: 'Dec', sales: 100},
         ]
       }
-    ]
+    ];
   }
 
   getSeriesMonth(): Array<any> {
@@ -110,7 +110,7 @@ export class ChartLineService {
       { name: 'Tablet', data: [100, 130, 135, 150, 170, 165, 180, 200] }
     ];
   }
-  
+
   constructor() { }
 
 }

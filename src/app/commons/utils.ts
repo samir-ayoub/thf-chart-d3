@@ -18,16 +18,11 @@ export const ThfGaugeColors = ['#29b6c5', '#b6bdbf'];
 export function setColor(data) {
 
   if (data) {
-    console.log('entrou');
-
     let index = data.length - 1;
 
     if (data.length <= 2) {
-      console.log('menor');
     return ThfGaugeColors;
-    }
-    
-    else {
+    } else {
       index = index >= 12 ? 11 : index;
       return ThfChartColors[index];
     }

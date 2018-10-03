@@ -4,11 +4,7 @@ import { ChartLineService } from './chart-line.service';
 import { ThfChartColors } from './../commons/utils';
 
 import * as d3 from 'd3';
-import * as d3Scale from 'd3-scale';
-import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import * as d3Shape from 'd3-shape';
-import * as d3Array from 'd3-array';
-import * as d3Axis from 'd3-axis';
 
 @Component({
   selector: 'app-chart-line',
@@ -17,7 +13,7 @@ import * as d3Axis from 'd3-axis';
   providers: [ChartLineService]
 })
 export class ChartLineComponent implements OnInit {
-  
+
   color;
   data;
   dots;
@@ -47,11 +43,11 @@ export class ChartLineComponent implements OnInit {
   constructor(private chartLineService: ChartLineService) {}
 
   ngOnInit() {
-    this.data = this.chartLineService.getData()
+    this.data = this.chartLineService.getData();
     this.color = this.setColor();
-    
+
     this.xScaleData = this.data.map(serie => serie.monthlySales.map(data => data.month))[0];
-      
+
     this.initChart();
     this.drawAxis();
     this.drawLines();
@@ -64,7 +60,7 @@ export class ChartLineComponent implements OnInit {
     this.height = 300 - this.margin.top - this.margin.bottom;
 
     this.xScale = d3.scalePoint()
-    .domain(this.xScaleData.map(categorie => {return categorie}))
+    .domain(this.xScaleData.map(categorie => categorie))
         .range([0, this.width]);
 
     this.yScale = d3.scaleLinear()
@@ -78,7 +74,7 @@ export class ChartLineComponent implements OnInit {
 
     this.svg = d3.select('.svg').append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom)
+      .attr('height', this.height + this.margin.top + this.margin.bottom);
 
     this.g = this.svg.append('g').attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
   }
@@ -106,7 +102,7 @@ export class ChartLineComponent implements OnInit {
   }
 
   private drawLines() {
-    let serieLineItem = this.g.selectAll('.serie-line-item')
+    const serieLineItem = this.g.selectAll('.serie-line-item')
       .data(this.data)
       .enter()
       .append('g')
@@ -128,9 +124,9 @@ export class ChartLineComponent implements OnInit {
       .enter()
       .append('g')
       .attr('class', 'serie-line-dot')
-      .attr("stroke", (d, i) => this.color[i])
+      .attr('stroke', (d, i) => this.color[i])
       .attr('stroke-width', '2')
-      .style("fill", '#ffffff')
+      .style('fill', '#ffffff')
       .selectAll('circle')
       .data(d => d.monthlySales)
       .enter()
@@ -145,13 +141,13 @@ export class ChartLineComponent implements OnInit {
           .style('opacity', .9);
         tooltip.html(dd.sales)
           .style('left', this.xScale(this.xScaleData[i]) + 35 + 'px')
-          .style('top', this.yScale(dd.sales) - 25 + 'px')
+          .style('top', this.yScale(dd.sales) - 25 + 'px');
         })
       .on('mouseout', () => {
         tooltip.transition()
           .duration(500)
           .style('opacity', 0);
-        })
+        });
   }
 
   drawLegend() {
@@ -195,6 +191,6 @@ export class ChartLineComponent implements OnInit {
       });
     });
     return maxX;
-  };
+  }
 
 }

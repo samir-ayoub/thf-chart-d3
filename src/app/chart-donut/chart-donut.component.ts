@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import * as d3 from 'd3';
 
-import { setColor } from '../commons/utils'
+import { setColor } from '../commons/utils';
 
 @Component({
   selector: 'app-chart-donut',
@@ -9,6 +9,7 @@ import { setColor } from '../commons/utils'
   styleUrls: ['./chart-donut.component.css']
 })
 export class ChartDonutComponent implements OnInit {
+
   arc;
   categories;
   color;
@@ -98,20 +99,20 @@ export class ChartDonutComponent implements OnInit {
           .style('opacity', .9);
         tooltip.html(d.data)
           .style('left', `${(document.getElementById('chartline').offsetWidth - 60) / 2}px`)
-          .style('top', `-32px`)
+          .style('top', `-32px`);
       })
       .on('mouseout', () => {
         tooltip.transition()
           .duration(500)
           .style('opacity', 0);
-      })
+      });
   }
 
   drawLabels() {
     this.pieChart.selectAll('text')
       .data(this.pie(this.data))
       .enter()
-      .append("text")
+      .append('text')
       .attr('transform', (d) => 'translate(' + this.labelArc.centroid(d) + ')')
       .attr('dy', '.35em')
       .text(function (d) { return d.data; });
@@ -119,16 +120,16 @@ export class ChartDonutComponent implements OnInit {
 
   drawCenterLabel() {
     if (this.totalCountHighLight) {
-      this.pieChart.append("text")
+      this.pieChart.append('text')
       .attr('class', 'highlight-data')
-      .attr("text-anchor", "middle")
+      .attr('text-anchor', 'middle')
       .attr('y', 0)
       .text(this.totalCountHighLight);
     }
     if (this.totalCountText) {
-      this.pieChart.append("text")
+      this.pieChart.append('text')
       .attr('class', 'highlight-data-text')
-      .attr("text-anchor", "middle")
+      .attr('text-anchor', 'middle')
       .attr('y', 20)
       .text(this.totalCountText);
     }
