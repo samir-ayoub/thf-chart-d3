@@ -48,7 +48,7 @@ export class ChartPieComponent implements OnInit {
 
     this.path = d3.arc()
       .outerRadius(this.radius - 20)
-      .innerRadius(0);
+      .innerRadius(50);
 
     this.labelArc = d3.arc()
       .outerRadius(this.radius)

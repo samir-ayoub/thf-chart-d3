@@ -1,5 +1,4 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-
 import { ChartLineService } from './chart-line.service';
 import { ThfChartColors } from './../commons/utils';
 
