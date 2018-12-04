@@ -14,6 +14,8 @@ export class AppComponent {
     { label: 'Chart Bar', link: './chart-bar2' },
     { label: 'Chart Pie', link: './chart-pie' },
     { label: 'Chart Donut', link: './chart-donut' },
+    { label: 'Chart Pie Canvas', link: './chart-pie-canvas' },
+    { label: 'Chart Pie Native', link: './chart-pie-native' },
   ];
 
 }

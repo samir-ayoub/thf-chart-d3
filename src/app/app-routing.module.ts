@@ -1,3 +1,5 @@
+import { ChartPieNativeComponent } from './chart-svg-native/chart-pie-native/chart-pie-native.component';
+import { ChartPieCanvasComponent } from './chart-canvas/chart-pie-canvas/chart-pie-canvas.component';
 import { ChartLine2Component } from './chart-line-2/chart-line-2.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -15,6 +17,8 @@ const routes: Routes = [
   { path: 'chart-bar2', component: ChartBar2Component },
   { path: 'chart-pie', component: ChartPieComponent },
   { path: 'chart-donut', component: ChartDonutComponent },
+  { path: 'chart-pie-canvas', component: ChartPieCanvasComponent },
+  { path: 'chart-pie-native', component: ChartPieNativeComponent },
 ];
 
 @NgModule({

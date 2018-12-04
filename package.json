@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "6.1.7",
     "@angular/platform-server": "6.1.7",
     "@angular/router": "6.1.7",
+    "@totvs/thf-tslint": "^2.9.0",
     "@totvs/thf-ui": "^2.9.0",
     "core-js": "^2.4.1",
     "d3": "^5.5.0",

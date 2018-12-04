@@ -1,0 +1,27 @@
+#myCanvas {
+  margin: 0 auto;
+  display: block;
+}
+
+#chartLegend {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.legend-item {
+  display: inline-block;
+}
+
+.legend-square {
+  display: inline-block;
+  height: 16px;
+  margin-right: .5em;
+  width: 16px;
+  position: relative;
+  top: 4px;
+}
+
+.legend-text {
+  display: inline-block;
+  font-size: 12px;
+}
