@@ -30,16 +30,9 @@ export class ChartPieNativeComponent implements OnInit {
   }
 
   initialSetup() {
-    // this.width = document.getElementById('chartline').offsetWidth - this.margin.left - this.margin.right;
-
     this.myCanvas = document.getElementById('svgCanvas');
     this.myCanvas.width = 300;
     this.myCanvas.height = 300;
-
-    // this.drawPie();
-    // this.drawDonetHole(this.donutSize);
-    // this.drawLabels();
-    // this.drawLegend();
 
     this.chartData = this.calculateSlices();
 

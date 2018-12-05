@@ -1,7 +1,5 @@
 import { ThfChartColors } from './../../commons/utils';
-import { Component, OnInit, ViewChild, Renderer2, ElementRef } from '@angular/core';
-
-import { PieChart } from './model/Piechart';
+import { Component, OnInit, ViewChild, Renderer2, ElementRef, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-chart-pie-canvas',
@@ -15,6 +13,11 @@ export class ChartPieCanvasComponent implements OnInit {
   donutSize = 0.5;
   myCanvas;
 
+  chartPieItems = [];
+
+  offsetLeft;
+  offsetTop;
+
   myVinyls = [
     {style: 'Classical Music', data: 10},
     {style: 'Alternative Rock', data: 14},
@@ -24,7 +27,10 @@ export class ChartPieCanvasComponent implements OnInit {
 
   @ViewChild('chartLegend') chartLegend: ElementRef;
 
-  constructor(private renderer: Renderer2) { }
+  constructor(
+    private renderer: Renderer2,
+    private el: ElementRef) {
+  }
 
   ngOnInit() {
     this.renderCanvas();
@@ -36,12 +42,27 @@ export class ChartPieCanvasComponent implements OnInit {
     this.myCanvas = document.getElementById('myCanvas');
     this.myCanvas.width = 300;
     this.myCanvas.height = 300;
+    this.offsetLeft = this.myCanvas.offsetLeft;
+    this.offsetTop = this.myCanvas.offsetTop;
     this.ctx = this.myCanvas.getContext('2d');
 
     this.drawPie();
     this.drawDonetHole(this.donutSize);
     this.drawLabels();
     this.drawLegend();
+
+    this.renderer.listen(this.myCanvas, 'mousemove', event => {
+      const mouseX = event.layerX;
+      const mouseY = event.layerY;
+
+      this.chartPieItems.map(data => {
+        this.definePieSlice(data);
+        if (this.ctx.isPointInPath(mouseX, mouseY)) {
+          console.log(data.data);
+        }
+      });
+    });
+
   }
 
   drawLine(ctx, startX, startY, endX, endY) {
@@ -58,12 +79,18 @@ export class ChartPieCanvasComponent implements OnInit {
   }
 
   drawPieSlice(ctx, centerX, centerY, radius, startAngle, endAngle, color) {
+
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-    ctx.closePath();
     ctx.fill();
+  }
+
+  definePieSlice(item) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(item.cx, item.cy);
+    this.ctx.arc(item.cx, item.cy, item.radius, item.start, item.end);
   }
 
   drawPie() {
@@ -72,9 +99,9 @@ export class ChartPieCanvasComponent implements OnInit {
     let slice_angle;
     const color_index = 0;
 
-    this.myVinyls.map((vinyl, index) => {
-      // total_value += vinyl.data;
-      slice_angle = 2 * Math.PI * vinyl.data / total_value;
+    this.myVinyls.map((data, index) => {
+      // total_value += data.data;
+      slice_angle = 2 * Math.PI * data.data / total_value;
 
       this.drawPieSlice(
         this.ctx,
@@ -85,6 +112,16 @@ export class ChartPieCanvasComponent implements OnInit {
         start_angle + slice_angle,
         this.colors[index]
       );
+
+      this.chartPieItems.push({
+        cx: this.myCanvas.width / 2,
+        cy: this.myCanvas.height / 2,
+        radius: Math.min(this.myCanvas.width / 2, this.myCanvas.height / 2),
+        start: start_angle,
+        end: start_angle + slice_angle,
+        data
+      });
+
       start_angle += slice_angle;
     });
 
@@ -107,7 +144,6 @@ export class ChartPieCanvasComponent implements OnInit {
     let start_angle = 0;
     let slice_angle = 0;
 
-
     this.myVinyls.map(vinyl => {
       slice_angle = 2 * Math.PI * vinyl.data / total_value;
       const pieRadius = Math.min(this.myCanvas.width / 2, this.myCanvas.height / 2);
@@ -120,11 +156,11 @@ export class ChartPieCanvasComponent implements OnInit {
         labelX = this.myCanvas.width / 2 + (offset + pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
         labelY = this.myCanvas.height / 2 + (offset + pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
       }
-
-      const labelText = Math.round(100 * vinyl.data / total_value);
+      // calculando percentual
+      // const labelText = Math.round(100 * vinyl.data / total_value);
       this.ctx.fillStyle = 'white';
       this.ctx.font = 'bold 16px Arial';
-      this.ctx.fillText(labelText + '%', labelX, labelY);
+      this.ctx.fillText(vinyl.data, labelX, labelY);
       start_angle += slice_angle;
 
     });
