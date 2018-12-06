@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 
-import { setColor } from '../commons/utils';
+import { setColor } from '../../commons/utils';
 
 @Component({
   selector: 'app-chart-pie',

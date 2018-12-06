@@ -35,7 +35,6 @@ export class ChartPieNativeComponent implements OnInit {
     this.myCanvas.height = 300;
 
     this.chartData = this.calculateSlices();
-
     this.renderChartPie();
     this.drawDonetHole();
   }
@@ -101,8 +100,6 @@ export class ChartPieNativeComponent implements OnInit {
 
     this.svgElement.setAttributeNS(null, 'style', `width: ${this.size}px; height: ${this.size}px`);
     this.myCanvas.appendChild(this.svgElement);
-
-    console.log(this.chartData);
 
     this.chartData.map(item => {
       const slicePie = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
