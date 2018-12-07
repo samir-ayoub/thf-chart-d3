@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 
 import { ThfChartBaseComponent } from './thf-chart-base.component';
 
@@ -27,19 +27,20 @@ export class ThfChartComponent extends ThfChartBaseComponent implements OnInit {
 
   @ViewChild('chartWrapper') chartWrapper: ElementRef;
 
-  constructor() { super(); }
+  constructor(private renderer: Renderer2) { super(); }
 
   ngOnInit() {
     this.initChart();
   }
 
   initChart() {
-    this.width = this.chartWrapper.nativeElement.offsetWidth;
+    this.width = this.chartWrapper.nativeElement.clientWidth;
 
     this.svgElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 
     this.chartPieStoredData = this.chartPieStoreData();
     this.renderChartPie();
+    this.renderLabels();
   }
 
   chartPieStoreData() {
@@ -110,10 +111,11 @@ export class ThfChartComponent extends ThfChartBaseComponent implements OnInit {
   }
 
   renderChartPie() {
-    const centerX = this.height / 2 - this.margin;
+    const centerX = this.chartPieStoredData[0].centerX;
+    const centeringChartPie = (this.width / 2) - this.margin - centerX;
 
     this.svgElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
-    this.svgElement.setAttribute('viewBox', `0 0 ${this.width - (this.margin * 2)} ${this.height - (this.margin * 2)}`);
+    this.svgElement.setAttribute('viewBox', `-${centeringChartPie} 0 ${this.width - (this.margin * 2)} ${this.height - (this.margin * 2)}`);
 
     this.svgElement.setAttributeNS(null, 'style', `width: ${this.width - (this.margin * 2)}px; height: ${this.height - (this.margin * 2)}px`);
     this.chartWrapper.nativeElement.appendChild(this.svgElement);
@@ -124,11 +126,24 @@ export class ThfChartComponent extends ThfChartBaseComponent implements OnInit {
     this.chartPieStoredData.map(item => {
       const slicePie = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
       slicePie.setAttributeNS(null, 'fill', item.color);
+      slicePie.setAttributeNS(null, 'data-tooltip-text', item.percentage);
       slicePie.setAttributeNS(null, 'd', 'M' + item.centerX + ',' + item.centerX + ' L' + item.centerX + ',0 A' + item.centerX + ',' + item.centerX + ' 1 0,1 ' + item.X + ', ' + item.Y + ' z');
       slicePie.setAttributeNS(null, 'transform', 'rotate(' + item.R + ', ' + item.centerX + ', ' + item.centerX + ')');
 
+      slicePie.addEventListener('mouseover', event => {
+        console.log(event.target.getAttributeNS(null, "data-tooltip-text"));
+      })
+
       svgElementG.appendChild(slicePie);
+
+      // this.renderer.listen(slicePie, 'mousemove', (item) => {
+      //   return console.log(item)
+      // });
     });
+  }
+
+  renderLabels() {
+
   }
 
   setColor() {
