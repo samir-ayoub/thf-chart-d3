@@ -1,5 +1,42 @@
 .thf-chart-wrapper {
   width: 100%;
-  padding: 32px;
+  padding: 24px;
   border: 1px solid gray
+}
+
+.thf-chart-header {
+  margin-bottom: 24px;
+}
+
+.thf-chart-title {
+  font-family: NunitoSans;
+  font-size: 16px;
+}
+
+.thf-chart-legend {
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.thf-chart-legend-item {
+  display: inline-block;
+}
+
+.thf-chart-legend-item:not(:first-child) {
+  margin-left: 24px;
+}
+
+.thf-chart-legend-square {
+  display: inline-block;
+  height: 16px;
+  margin-right: 8px;
+  width: 16px;
+  position: relative;
+  top: 4px;
+}
+
+.thf-chart-legend-text {
+  display: inline-block;
+  font-size: 12px;
 }

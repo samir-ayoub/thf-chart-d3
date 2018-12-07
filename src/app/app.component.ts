@@ -8,10 +8,10 @@ import { Component } from '@angular/core';
 export class AppComponent {
 
   dataSeries = [
-    { style: 'Classical Music', data: 10 },
-    { style: 'Alternative Rock', data: 14 },
-    { style: 'Pop', data: 2 },
-    { style: 'Jazz', data: 12 }
+    { category: 'Classical Music', value: 10 },
+    { category: 'Alternative Rock', value: 14 },
+    { category: 'Pop', value: 2 },
+    { category: 'Jazz', value: 12 }
   ];
 
 
@@ -24,7 +24,7 @@ export class AppComponent {
     { label: 'Chart Donut', link: './chart-donut' },
     { label: 'Chart Pie Canvas', link: './chart-pie-canvas' },
     { label: 'Chart Pie Native', link: './chart-pie-native' },
-    { label: 'THF Chart', link: './thf-chart' },
+    // { label: 'THF Chart', link: './thf-chart-vale' },
   ];
 
 }

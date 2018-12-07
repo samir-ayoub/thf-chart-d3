@@ -1,3 +1,4 @@
+import { ComponenteChartComponent } from './componente-chart/componente-chart.component';
 import { ChartPieNativeComponent } from './chart-svg-native/chart-pie-native/chart-pie-native.component';
 import { ChartPieCanvasComponent } from './chart-canvas/chart-pie-canvas/chart-pie-canvas.component';
 import { NgModule } from '@angular/core';
@@ -9,7 +10,6 @@ import { ChartPieComponent } from './chart-d3/chart-pie/chart-pie.component';
 import { ChartDonutComponent } from './chart-d3/chart-donut/chart-donut.component';
 import { ChartBar2Component } from './chart-d3/chart-bar2/chart-bar2.component';
 import { ChartLine2Component } from './chart-d3/chart-line-2/chart-line-2.component';
-import { ThfChartComponent } from './components/thf-chart/thf-chart.component';
 
 const routes: Routes = [
   { path: 'chart-line', component: ChartLineComponent },
@@ -20,7 +20,7 @@ const routes: Routes = [
   { path: 'chart-donut', component: ChartDonutComponent },
   { path: 'chart-pie-canvas', component: ChartPieCanvasComponent },
   { path: 'chart-pie-native', component: ChartPieNativeComponent },
-  { path: 'thf-chart', component: ThfChartComponent },
+  { path: 'thf-chart-vale', component: ComponenteChartComponent },
 ];
 
 @NgModule({

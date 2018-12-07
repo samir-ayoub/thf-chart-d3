@@ -2,11 +2,14 @@ import { EventEmitter, Input, Output, ViewChild, ElementRef } from '@angular/cor
 
 export class ThfChartBaseComponent {
 
-  private _height?: number = 400;
+  @ViewChild('chartWrapper') chartWrapper: ElementRef;
+
+  private _height?: number;
+
+  hasFixedHeightValue: number;
 
   @Input('t-height') set height(value: number) {
-    const number = this.convertToNumber(value);
-    this._height = number && number > 0 ? number : 400;
+    this._height = this.convertToNumber(value);
   }
 
   get height(): number {
@@ -15,7 +18,7 @@ export class ThfChartBaseComponent {
 
   @Input('t-title') title?: string;
 
-  @Input('series') series;
+  @Input('t-series') series;
 
   @Input('categories') categories?: Array<string>;
 

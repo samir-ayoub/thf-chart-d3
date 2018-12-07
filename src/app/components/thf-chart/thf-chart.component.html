@@ -1,6 +1,22 @@
-
+<!-- 
 <div #chartWrapper 
-id="svgCanvas" 
-class="thf-chart-wrapper"
-style.height="{{height + 'px'}}"
-></div>
+  class="thf-chart-wrapper"
+  (window:resize)="onWindowResize()">
+
+
+</div> -->
+
+
+<div #chartWrapper class="thf-chart-wrapper"
+  (window:resize)="onWindowResize()">
+  <div class="thf-chart-header">
+    <span class="thf-chart-title">{{ title }}</span>
+  </div>
+  <div class="thf-chart"></div>
+  <div class="thf-chart-legend">
+    <div class="thf-chart-legend-item" *ngFor="let serie of series; let i = index">
+      <div class="thf-chart-legend-square" [style.background]="colors[i]"></div>
+      <span class="thf-chart-legend-text">{{ serie.category }}</span>
+    </div>
+  </div>
+</div>

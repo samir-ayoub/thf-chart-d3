@@ -14,6 +14,7 @@ import { ChartBar2Component } from './chart-d3/chart-bar2/chart-bar2.component';
 import { ThfChartComponent } from './components/thf-chart/thf-chart.component';
 import { ChartPieCanvasComponent } from './chart-canvas/chart-pie-canvas/chart-pie-canvas.component';
 import { ChartPieNativeComponent } from './chart-svg-native/chart-pie-native/chart-pie-native.component';
+import { ComponenteChartComponent } from './componente-chart/componente-chart.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { ChartPieNativeComponent } from './chart-svg-native/chart-pie-native/cha
     ChartBar2Component,
     ThfChartComponent,
     ChartPieCanvasComponent,
-    ChartPieNativeComponent
+    ChartPieNativeComponent,
+    ComponenteChartComponent
   ],
   imports: [
     BrowserModule,
