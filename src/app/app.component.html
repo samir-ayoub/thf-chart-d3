@@ -3,15 +3,6 @@
 
   <thf-menu [t-menus]="menus"></thf-menu>
   
-  <thf-page-default t-title="Chart Pie">
-      <router-outlet></router-outlet>
-    <div class="thf-row">
-      
-      <div class="thf-md-6">
-        <thf-chart [t-series]="dataSeries" t-title="pieChart teste"></thf-chart>
-      </div>
-      
-      
-    </div>
-  </thf-page-default>
+  <router-outlet></router-outlet>
+
 </div>

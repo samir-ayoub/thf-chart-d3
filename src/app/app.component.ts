@@ -24,6 +24,7 @@ export class AppComponent {
     { label: 'Chart Donut', link: './chart-donut' },
     { label: 'Chart Pie Canvas', link: './chart-pie-canvas' },
     { label: 'Chart Pie Native', link: './chart-pie-native' },
+    { label: 'Chart Line Native', link: './chart-line-native' },
     // { label: 'THF Chart', link: './thf-chart-vale' },
   ];
 

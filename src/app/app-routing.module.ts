@@ -10,6 +10,7 @@ import { ChartPieComponent } from './chart-d3/chart-pie/chart-pie.component';
 import { ChartDonutComponent } from './chart-d3/chart-donut/chart-donut.component';
 import { ChartBar2Component } from './chart-d3/chart-bar2/chart-bar2.component';
 import { ChartLine2Component } from './chart-d3/chart-line-2/chart-line-2.component';
+import { ChartLineNativeComponent } from './chart-svg-native/chart-line-native/chart-line-native.component';
 
 const routes: Routes = [
   { path: 'chart-line', component: ChartLineComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'chart-donut', component: ChartDonutComponent },
   { path: 'chart-pie-canvas', component: ChartPieCanvasComponent },
   { path: 'chart-pie-native', component: ChartPieNativeComponent },
+  { path: 'chart-line-native', component: ChartLineNativeComponent },
   { path: 'thf-chart-vale', component: ComponenteChartComponent },
 ];
 
